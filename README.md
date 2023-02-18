@@ -6,8 +6,8 @@ Extremely helpful OCR code
 
 ###
 
- Deskewing
- Edge detection
+ * Deskewing
+ * Edge detection
  Contour Detection
  Rotation
  Adaptive Thresholding
@@ -18,3 +18,4 @@ Extremely helpful OCR code
  Angle Correction
  Auto Deskew looping through an entire folder of images
  ID CARD Image preprocessing
+
