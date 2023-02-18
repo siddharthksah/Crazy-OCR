@@ -1,2 +1,5 @@
 # Crazy-OCR
-Extremely helpful OCR code I wrote working on a project for about a year - all for free on GitHub!
+Extremely helpful OCR code
+
+# Wrote these when building a robust OCR pipeline for ID Cards for KYC
+# Please refer to the code comments to know more about how specific files work
