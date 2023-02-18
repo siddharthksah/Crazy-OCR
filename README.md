@@ -8,14 +8,14 @@ Extremely helpful OCR code
 
  * Deskewing
  * Edge detection
- Contour Detection
- Rotation
- Adaptive Thresholding
- Multi image/file format compatibility
- Regex matching for FIN & DOB
- Interactive Morphing
- Interactive Image Intensity correction
- Angle Correction
- Auto Deskew looping through an entire folder of images
- ID CARD Image preprocessing
+ * Contour Detection
+ * Rotation
+ * Adaptive Thresholding
+ * Multi image/file format compatibility
+ * Regex matching for FIN & DOB
+ * Interactive Morphing
+ * Interactive Image Intensity correction
+ * Angle Correction
+ * Auto Deskew looping through an entire folder of images
+ * ID CARD Image preprocessing
 
