@@ -14,6 +14,10 @@ import pandas as pd
 
 from deskew import determine_skew
 
+# this is like a brute force way to increase the amount of ID card which can be processed
+# since the OCR is sensitive to the orientation we kinda look at slight changes in the 
+# orientation and see if that helps in OCR - this actually works surprisingly good - ik
+
 
 # this functions take the front image of the ID card and returns a string of all the text information in the image
 def textExtractorfront_jpg(image_location):
