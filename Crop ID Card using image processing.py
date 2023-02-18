@@ -8,6 +8,8 @@ import cv2
 import matplotlib.pyplot as plt
 from PIL import Image, ImageEnhance
 
+# crop the area of interest of the ID card using vanilla image processing
+# edge and contour detection
 
 
 def crop_image(image, front_back):
