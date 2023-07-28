@@ -1,6 +1,4 @@
 """
-Filename: morphology_operations.py
-
 This Python script is designed to perform morphology operations (like erode/dilate, 
 open/close, blackhat/tophat, and gradient) on an image. It can be useful in various 
 image processing tasks such as noise reduction, image enhancement etc.
