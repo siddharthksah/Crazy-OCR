@@ -1,5 +1,11 @@
 # Crazy-OCR :eyes: :zap:
 ![Header](./header.png)
+<p align="center">
+  <a href="https://github.com/siddharthksah/Crazy-OCR/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/siddharthksah/Crazy-OCR"></a>
+  <a href="https://github.com/siddharthksah/Crazy-OCR/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/siddharthksah/Crazy-OCR"></a>
+  <a href="https://github.com/siddharthksah/Crazy-OCR/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/siddharthksah/Crazy-OCR"></a>
+  <a href="https://github.com/siddharthksah/Crazy-OCR/blob/main/LICENSE.txt"><img alt="GitHub license" src="https://img.shields.io/github/license/siddharthksah/Crazy-OCR"></a>
+</p>
 
 Welcome to **Crazy-OCR**! :wave: Your one-stop destination for all your Optical character recognition(OCR) needs. This repository contains a robust and versatile OCR pipeline I developed while working on ID Cards for KYC. Feel free to explore, clone, or fork! 
 
