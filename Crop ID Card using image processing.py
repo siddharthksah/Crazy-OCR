@@ -1,83 +1,53 @@
-# importing the necessary packages
-import re
+"""
+This module processes an image and crops the area of interest. 
+It uses image processing techniques such as edge and contour detection.
+"""
+
 import cv2
-import pytesseract
 import matplotlib.pyplot as plt
 import numpy as np
-import cv2
-import matplotlib.pyplot as plt
-from PIL import Image, ImageEnhance
 
-# crop the area of interest of the ID card using vanilla image processing
-# edge and contour detection
+def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
+    """
+    Function to resize an image while keeping the aspect ratio intact.
 
+    :param image: np.array, Original Image
+    :param width: int, Width that the image is resized to
+    :param height: int, Height that the image is resized to
+    :param inter: cv2 interpolation method, Default is cv2.INTER_AREA
+    :return: np.array, Resized image
+    """
+    dim = None
+    (h, w) = image.shape[:2]
 
-def crop_image(image, front_back):
+    if width is None and height is None:
+        return image
 
-    def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
-        # initialize the dimensions of the image to be resized and
-        # grab the image size
-        dim = None
-        (h, w) = image.shape[:2]
+    if width is None:
+        r = height / float(h)
+        dim = (int(w * r), height)
+    else:
+        r = width / float(w)
+        dim = (width, int(h * r))
 
-        # if both the width and height are None, then return the
-        # original image
-        if width is None and height is None:
-            return image
-
-        # check to see if the width is None
-        if width is None:
-            # calculate the ratio of the height and construct the
-            # dimensions
-            r = height / float(h)
-            dim = (int(w * r), height)
-
-        # otherwise, the height is None
-        else:
-            # calculate the ratio of the width and construct the
-            # dimensions
-            r = width / float(w)
-            dim = (width, int(h * r))
-
-        # resize the image
-        resized = cv2.resize(image, dim, interpolation = inter)
-
-        # return the resized image
-        return resized
-
-    img = image_resize(image, width = 600)
-
-    #img = ImageEnhance.Sharpness(img)
-
-    plt.imshow(img)
-    plt.show()
-
-    # sharpen_filter = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
-    # img = cv2.filter2D(img, -1, sharpen_filter)
+    resized = cv2.resize(image, dim, interpolation=inter)
+    return resized
 
 
+def process_image(img):
+    """
+    Process image to detect the contour of interest.
 
-    #convert image to grayscale
+    :param img: np.array, Original Image
+    :return: np.array, Image with the contour of interest cropped.
+    """
     grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    #blurr image to smooth
     blurr = cv2.GaussianBlur(grey, (5,5),0)
-
-
-
-    #finding edges
     edge = cv2.Canny(blurr, 0, 50)
 
-    plt.imshow(edge)
-    plt.show()
-
-    #apadtive threshold and canny gave similar final output
-    #threshold = cv2.adaptiveThreshold(blurr ,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
-    #find contours in thresholded image and sort them according to decreasing area
     contours, _ = cv2.findContours(edge, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = sorted(contours, key=cv2.contourArea, reverse= True)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)
 
-    #contour approximation
     for i in contours:
         elip =  cv2.arcLength(i, True)
         approx = cv2.approxPolyDP(i,0.08*elip, True)
@@ -86,16 +56,20 @@ def crop_image(image, front_back):
             doc = approx
             break
 
-    #draw contours
     cv2.drawContours(img, [doc], -1, (0, 255, 0), 2)
 
-    plt.imshow(img)
-    plt.show()
+    return doc, img
 
-    #reshape to avoid errors ahead
+
+def reshape_and_transform(doc, img):
+    """
+    Reshaping and transforming the image based on contours.
+
+    :param doc: np.array, Contour
+    :param img: np.array, Image
+    :return: np.array, Reshaped and Transformed Image
+    """
     doc=doc.reshape((4,2))
-
-    #create a new array and initialize
     new_doc = np.zeros((4,2), dtype="float32")
 
     Sum = doc.sum(axis = 1)
@@ -107,62 +81,47 @@ def crop_image(image, front_back):
     new_doc[3] = doc[np.argmax(Diff)]
 
     (tl,tr,br,bl) = new_doc
-
-    #find distance between points and get max
     dist1 = np.linalg.norm(br-bl)
     dist2 = np.linalg.norm(tr-tl)
-
     maxLen = max(int(dist1),int(dist2))
-
     dist3 = np.linalg.norm(tr-br)
     dist4 = np.linalg.norm(tl-bl)
-
     maxHeight = max(int(dist3), int(dist4))
 
     dst = np.array([[0,0],[maxLen-1, 0],[maxLen-1, maxHeight-1], [0, maxHeight-1]], dtype="float32")
-
     N = cv2.getPerspectiveTransform(new_doc, dst)
     warp = cv2.warpPerspective(img, N, (maxLen, maxHeight))
-
-
     img2 = cv2.cvtColor(warp, cv2.COLOR_BGR2GRAY)
-    # plt.imshow(img2)
-    # plt.show()
-    #img2 = cv2.resize(img2,(600,800))
 
-    #cv2.imwrite("edge.jpg", edge)
-    #cv2.imwrite("contour.jpg", img)
-    #cv2.imwrite("Scanned.jpg", img2)
-
-    # show all images
-    # cv2.imshow("Original.jpg",img)
-    # cv2.imshow("Grey.jpg",grey)
-    # cv2.imshow("Gaussian_Blur.jpb",blurr)
-    # cv2.imshow("Canny_Edge.jpg",edge)
-    # #cv2.imshow("Threshold.jpg",threshold)
-    # cv2.imshow("Contours.jpg", img)
-    # cv2.imshow("Scanned.jpg", img2)
-    #
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-
-    plt.imshow(img2)
-    plt.show()
-
-    #cv2.imwrite('./data/temp/front_cropped.png', img2)
-    #print('Image Saved in the temp directory!')
-
-    if front_back == "front":
-        cv2.imwrite('./data/temp/front_cropped.png', img2)
-    elif front_back == "back":
-        cv2.imwrite('./data/temp/back_cropped.png', img2)
-    else:
-        print("Pass right parameters in the crop function!")
-
-#location of the input image
+    return img2
 
 
-#img = Image.open("./data/front.png")
+def crop_image(image_path, output_path):
+    """
+    Main function to crop an image.
 
-img = cv2.imread("./data/output/File 1.jpg")
-crop_image(img, 'front')
+    :param image_path: str, Path to the image to be cropped
+    :param output_path: str, Path to save the cropped image
+    """
+    try:
+        img = cv2.imread(image_path)
+    except Exception as e:
+        print(f"Error: Unable to read image file: {image_path}. Exception: {str(e)}")
+        return
+
+    img = image_resize(img, width=600)
+    doc, img = process_image(img)
+    img2 = reshape_and_transform(doc, img)
+
+    try:
+        cv2.imwrite(output_path, img2)
+        print(f"Image Saved at {output_path}")
+    except Exception as e:
+        print(f"Error: Unable to save image file: {output_path}. Exception: {str(e)}")
+        return
+
+
+if __name__ == "__main__":
+    input_path = "./data/output/File 1.jpg"
+    output_path_front = './data/temp/front_cropped.png'
+    crop_image(input_path, output_path_front)
