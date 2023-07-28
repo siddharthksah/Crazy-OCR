@@ -24,6 +24,32 @@ All the files are extensively commented for your better understanding. Please re
 
 Clone this repository to your local machine and run the scripts according to your requirements. Each script is independent and self-explanatory. Just make sure you have the required dependencies installed! If you have any issues, feel free to open an issue. :memo:
 
+## Repository Contents :file_folder:
+
+Here's a brief overview of the various scripts in the repository:
+
+1. `common.py`: :wrench: - Commonly used functions and utilities.
+2. `crop_id_card_using_edge_contour_detection.py`: :scissors: - Script to crop ID cards using edge and contour detection techniques.
+3. `deskew_image_from_AC20_C20.py`: :straight_ruler: - A dedicated script to deskew images sourced from AC20_C20.
+4. `deskew_image_rotate_loop.py`: :arrows_counterclockwise: - Script for deskewing and rotating images in a loop.
+5. `deskew_loop_image_folder.py`: :file_folder: - A utility for deskewing all images in a given folder.
+6. `id_card_detection_camera.py`: :camera: - Script to detect ID cards using a camera.
+7. `id_card_dob_extractor.py`: :birthday: - A tool to extract DOB from ID cards.
+8. `id_card_expiry_date_extractor.py`: :calendar: - Extracts the expiry date from ID cards.
+9. `image_blurriness_detection.py`: :mag_right: - An image quality analysis tool focused on blurriness detection.
+10. `image_deskewer.py`: :triangular_ruler: - A utility for deskewing single images.
+11. `interactive_image_morphing.py`: :sparkles: - A tool for interactively morphing images.
+12. `loop_through_morphed_images.py`: :repeat: - Utility to loop through morphed images.
+13. `morphology_operations.py`: :loop: - Perform morphology operations for image processing.
+14. `pdf2jpg.py`: :arrow_right: - Utility to convert PDF files to JPG.
+15. `pdf_page_extractor.py`: :outbox_tray: - A script to extract specific pages from PDF files.
+16. `photo_collage_maker.py`: :frame_photo: - A fun utility to create photo collages.
+17. `preprocess_image.py`: :art: - A script for preliminary image processing.
+18. `rotate_image_certain_angle.py`: :arrows_counterclockwise: - A utility to rotate images by a specified angle.
+19. `show_image.py`: :framed_picture: - A script to display images.
+
+Each file is extensively commented for better understanding. Refer to the code comments to know more about how specific files work. :notebook:
+
 ## Contributions :handshake:
 
 Contributions are always welcomed. :smiley: If you have some ideas or improvements, feel free to make a pull request or open an issue to discuss it.
