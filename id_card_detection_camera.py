@@ -1,5 +1,3 @@
-# id_card_detector.py
-
 """
 This script is used to perform real-time object detection using TensorFlow and OpenCV.
 It detects objects in a webcam feed, draws bounding boxes around the detected objects, and displays the feed in a window.
