@@ -1,108 +1,113 @@
+# id_card_detector.py
 
-# Import packages
+"""
+This script is used to perform real-time object detection using TensorFlow and OpenCV.
+It detects objects in a webcam feed, draws bounding boxes around the detected objects, and displays the feed in a window.
+
+Usage: Run the script in an environment with TensorFlow, OpenCV, and numpy installed.
+Press 'q' to quit the video window.
+"""
+
+# Import necessary packages
 import os
+import sys
 import cv2
 import numpy as np
 import tensorflow as tf
-import sys
 
-# This is needed since the notebook is stored in the object_detection folder.
+# Append the path for utility scripts
 sys.path.append("..")
 
-# Import utilites
-from utils import label_map_util
-from utils import visualization_utils as vis_util
+# Import utilities for label maps and visualization
+from utils import label_map_util, visualization_utils as vis_util
 
-# Name of the directory containing the object detection module we're using
+# Constants
 MODEL_NAME = 'model'
-
-# Grab path to current working directory
 CWD_PATH = os.getcwd()
-
-# Path to frozen detection graph .pb file, which contains the model that is used
-# for object detection.
-PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
-
-# Path to label map file
-PATH_TO_LABELS = os.path.join(CWD_PATH,'data','labelmap.pbtxt')
-
-# Number of classes the object detector can identify
+PATH_TO_CKPT = os.path.join(CWD_PATH, MODEL_NAME, 'frozen_inference_graph.pb')
+PATH_TO_LABELS = os.path.join(CWD_PATH, 'data', 'labelmap.pbtxt')
 NUM_CLASSES = 1
 
-## Load the label map.
-# Label maps map indices to category names, so that when our convolution
-# network predicts `5`, we know that this corresponds to `king`.
-# Here we use internal utility functions, but anything that returns a
-# dictionary mapping integers to appropriate string labels would be fine
-label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
-category_index = label_map_util.create_category_index(categories)
+def load_model_and_labels():
+    """
+    Loads the trained model and label map.
 
-# Load the Tensorflow model into memory.
-detection_graph = tf.Graph()
-with detection_graph.as_default():
-    od_graph_def = tf.GraphDef()
-    with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
-        serialized_graph = fid.read()
-        od_graph_def.ParseFromString(serialized_graph)
-        tf.import_graph_def(od_graph_def, name='')
+    Returns:
+    tuple: (session, detection graph, category index)
+    """
+    # Load the label map and convert it to categories
+    label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
+    categories = label_map_util.convert_label_map_to_categories(
+        label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
+    category_index = label_map_util.create_category_index(categories)
+
+    # Load the TensorFlow model into memory
+    detection_graph = tf.Graph()
+    with detection_graph.as_default():
+        od_graph_def = tf.GraphDef()
+        with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
+            serialized_graph = fid.read()
+            od_graph_def.ParseFromString(serialized_graph)
+            tf.import_graph_def(od_graph_def, name='')
 
     sess = tf.Session(graph=detection_graph)
 
+    return sess, detection_graph, category_index
 
-# Define input and output tensors (i.e. data) for the object detection classifier
 
-# Input tensor is the image
-image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+def object_detection_webcam(sess, detection_graph, category_index):
+    """
+    Perform object detection using webcam feed.
 
-# Output tensors are the detection boxes, scores, and classes
-# Each box represents a part of the image where a particular object was detected
-detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+    Args:
+    sess: TensorFlow Session
+    detection_graph: TensorFlow graph object
+    category_index: Dictionary mapping labels to category names
+    """
+    # Define tensors for the graph
+    image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+    detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+    detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+    detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+    num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 
-# Each score represents level of confidence for each of the objects.
-# The score is shown on the result image, together with the class label.
-detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
-detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+    # Initialize webcam
+    video = cv2.VideoCapture(0)
+    ret = video.set(3, 1280)
+    ret = video.set(4, 720)
 
-# Number of objects detected
-num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+    try:
+        while True:
+            ret, frame = video.read()
+            frame_expanded = np.expand_dims(frame, axis=0)
 
-# Initialize webcam feed
-video = cv2.VideoCapture(0)
-ret = video.set(3,1280)
-ret = video.set(4,720)
+            (boxes, scores, classes, num) = sess.run(
+                [detection_boxes, detection_scores, detection_classes, num_detections],
+                feed_dict={image_tensor: frame_expanded})
 
-while(True):
+            vis_util.visualize_boxes_and_labels_on_image_array(
+                frame,
+                np.squeeze(boxes),
+                np.squeeze(classes).astype(np.int32),
+                np.squeeze(scores),
+                category_index,
+                use_normalized_coordinates=True,
+                line_thickness=8,
+                min_score_thresh=0.60)
 
-    # Acquire frame and expand frame dimensions to have shape: [1, None, None, 3]
-    # i.e. a single-column array, where each item in the column has the pixel RGB value
-    ret, frame = video.read()
-    frame_expanded = np.expand_dims(frame, axis=0)
+            cv2.imshow('ID CARD DETECTOR', frame)
 
-    # Perform the actual detection by running the model with the image as input
-    (boxes, scores, classes, num) = sess.run(
-        [detection_boxes, detection_scores, detection_classes, num_detections],
-        feed_dict={image_tensor: frame_expanded})
+            if cv2.waitKey(1) == ord('q'):
+                break
 
-    # Draw the results of the detection (aka 'visulaize the results')
-    vis_util.visualize_boxes_and_labels_on_image_array(
-        frame,
-        np.squeeze(boxes),
-        np.squeeze(classes).astype(np.int32),
-        np.squeeze(scores),
-        category_index,
-        use_normalized_coordinates=True,
-        line_thickness=8,
-        min_score_thresh=0.60)
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
-    # All the results have been drawn on the frame, so it's time to display it.
-    cv2.imshow('ID CARD DETECTOR', frame)
+    finally:
+        video.release()
+        cv2.destroyAllWindows()
 
-    # Press 'q' to quit
-    if cv2.waitKey(1) == ord('q'):
-        break
 
-# Clean up
-video.release()
-cv2.destroyAllWindows()
-
+if __name__ == "__main__":
+    session, graph, index = load_model_and_labels()
+    object_detection_webcam(session, graph, index)
