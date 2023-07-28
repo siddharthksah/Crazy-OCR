@@ -1,5 +1,5 @@
 # Crazy-OCR :eyes: :zap:
-![Header](./your-header-image-name.png)
+![Header](./github-header-image.png)
 
 Welcome to **Crazy-OCR**! :wave: Your one-stop destination for all your Optical character recognition(OCR) needs. This repository contains a robust and versatile OCR pipeline I developed while working on ID Cards for KYC. Feel free to explore, clone, or fork! 
 
