@@ -1,6 +1,6 @@
 # Crazy-OCR :eyes: :zap:
 
-Welcome to **Crazy-OCR**! :wave: Your one-stop destination for all your OCR needs. This repository contains a robust and versatile OCR pipeline I developed while working on ID Cards for KYC. Feel free to explore, clone, or fork! 
+Welcome to **Crazy-OCR**! :wave: Your one-stop destination for all your Optical character recognition(OCR) needs. This repository contains a robust and versatile OCR pipeline I developed while working on ID Cards for KYC. Feel free to explore, clone, or fork! 
 
 ## What's Inside :mag_right:
 This repository houses a comprehensive set of OCR tools that I developed, including (but not limited to) the following features:
