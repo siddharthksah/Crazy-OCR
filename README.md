@@ -1,4 +1,3 @@
-# Crazy-OCR :eyes: :zap:
 ![Header](./header.png)
 <p align="center">
   <a href="https://github.com/siddharthksah/Crazy-OCR/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/siddharthksah/Crazy-OCR"></a>
