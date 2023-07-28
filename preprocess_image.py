@@ -1,5 +1,3 @@
-# ocr_image_processing.py
-
 """
 This script reads an image, applies pre-processing steps for Optical Character Recognition (OCR),
 extracts text from the processed image using Tesseract and displays the processed image.
