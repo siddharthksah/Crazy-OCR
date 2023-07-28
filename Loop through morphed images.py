@@ -1,76 +1,78 @@
-from PIL import Image
+"""
+This is an open-source Python script for processing text from images using pytesseract. 
+The script reads images, extracts text, detects a specific pattern in the text and 
+compiles the results into a Pandas DataFrame which is then exported as a CSV file.
+
+Author: Siddharth Kumar (www.siddharthsah.com)
+Last Updated: July 28, 2023
+"""
+
 import cv2
-import pytesseract
-import matplotlib.pyplot as plt
-import re
-import pandas as pd
-import numpy as np
 import os
-directory = './data/output/deskewed'
+import re
+import numpy as np
+import pandas as pd
+import pytesseract
+from PIL import Image
 
-array = []
-filenameArray = []
-FINArray = []
+def process_image(filename):
+    """
+    Processes an image to extract text and a specific pattern.
 
-for filename in os.listdir(directory):
+    Args:
+        filename (str): The filename of the image to process.
 
-    if filename.endswith(".jpg"):
-        #do smth
+    Returns:
+        tuple: A tuple containing the filename, length of characters detected, and 
+               the specific pattern detected (if any).
+    """
+    image = cv2.imread(f'./data/output/deskewed/{filename}')
 
-        #print(filename)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    gray = cv2.medianBlur(gray, 3)
 
-        image = cv2.imread('./data/output/deskewed/' + filename)
+    text = pytesseract.image_to_string(gray)
 
-        #print(image)
+    # Detecting specific pattern in text
+    fin = "None"
+    for element in text.split():
+        if re.match("^[STFG]\d{7}[A-Z]$", element):
+            fin = element
+            break
 
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        #
-        gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    return filename, len(text), fin
 
-        gray = cv2.medianBlur(gray, 3)
+def compile_results(directory):
+    """
+    Processes all images in a given directory and compiles the results into a DataFrame.
 
-        text = pytesseract.image_to_string(gray)
+    Args:
+        directory (str): The directory containing the images to process.
 
-        FIN = "None"
-        # getting the string of text from the image
-        string = text
-        # print(string)
+    Returns:
+        DataFrame: A DataFrame containing the results of the processing.
+    """
+    results = []
+    
+    for filename in os.listdir(directory):
+        if filename.endswith(".jpg"):
+            result = process_image(filename)
+            results.append(result)
+    
+    df = pd.DataFrame(results, columns=["Filename", "Length of characters detected", "FIN"])
+    
+    return df
 
-        # converting this string into an array by splitting it with the space
-        store_array = string.split()
+def main():
+    """
+    The main function to execute the image processing and result compilation.
+    """
+    directory = './data/output/deskewed'
 
-        # we do an element wise search to find which element in the array matches with regex of a FIN, this regex will work for both local and foreigner FIN
-        for element in store_array:
+    df = compile_results(directory)
+    df.to_csv("./data/output/deskewed/submission.csv", index=False)
+    print('Done!')
 
-            m = re.match("^[STFG]\d{7}[A-Z]$", element)
-
-            # See if success.
-            if m:
-                # print(element)
-                FIN = element
-
-
-            else:
-                #FINArray.append("None")
-                pass
-
-                # print("No FIN found!")
-        FINArray.append(FIN)
-
-
-
-        filenameArray.append(filename)
-
-        array.append(len(text))
-
-        #print(text)
-    else:
-        pass
-
-array = np.array(array)
-filenameArray = np.array(filenameArray)
-FINArray = np.array(FINArray)
-
-df = pd.DataFrame({"Filename" : filenameArray, "Length of characters detected" : array, "FIN": FINArray})
-df.to_csv("./data/output/deskewed/submission.csv", index=False)
-print('Done!')
+if __name__ == "__main__":
+    main()
