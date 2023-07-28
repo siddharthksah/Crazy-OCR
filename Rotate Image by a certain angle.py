@@ -1,6 +1,4 @@
 """
-filename: image_rotation.py
-
 This is an open-source Python script for image processing using OpenCV. 
 The script reads an image, determines its center, and then rotates the image around this center point.
 
